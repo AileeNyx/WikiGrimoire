@@ -1,9 +1,59 @@
 package com.aileenyx.wikigrimoire.screens
 
-import androidx.compose.material3.Text
+import GrimoireHeader
+import WikiCard
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SearchBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.material3.Text
+import com.aileenyx.wikigrimoire.util.wikis
+import androidx.compose.material3.Scaffold
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchScreen() {
-    Text(text = "SEARCH: add your screen here")
+fun SearchScreen(modifier: Modifier = Modifier) {
+    val searchQuery = remember { mutableStateOf("") }
+    val filteredWikis = remember(searchQuery.value) {
+        wikis.filter { it.name.contains(searchQuery.value, ignoreCase = true) }
+            .sortedBy { it.name }
+    }
+
+    Scaffold(
+        topBar = {
+            GrimoireHeader(
+                title = "Wiki Grimoire",
+                showProfilePicture = true,
+                showBackArrow = false,
+                onProfileClick = { /* Handle profile click */ },
+                onBackClick = { /* Handle back click */ }
+            )
+        }
+    ) { innerPadding ->
+        Column(
+            modifier = modifier.padding(innerPadding)
+        ) {
+            SearchBar(
+                query = searchQuery.value,
+                onQueryChange = { searchQuery.value = it },
+                onSearch = { /* Handle search action */ },
+                active = false,
+                onActiveChange = { /* Handle active state change */ },
+                placeholder = { Text("Search") },
+                content = { /* Additional content if needed */ }
+            )
+            for (wiki in filteredWikis) {
+                WikiCard(
+                    name = wiki.name,
+                    url = wiki.url,
+                    image = wiki.bannerImage,
+                    isLarge = false
+                )
+            }
+        }
+    }
 }

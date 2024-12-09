@@ -1,5 +1,6 @@
 package com.aileenyx.wikigrimoire
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -16,6 +17,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -24,15 +26,23 @@ import androidx.navigation.compose.rememberNavController
 import com.aileenyx.wikigrimoire.screens.CreateScreen
 import com.aileenyx.wikigrimoire.screens.HomeScreen
 import com.aileenyx.wikigrimoire.screens.SearchScreen
-import com.aileenyx.wikigrimoire.util.Screen.CreateScreen.toScreen
 import com.aileenyx.wikigrimoire.ui.theme.WikiGrimoireTheme
-import com.aileenyx.wikigrimoire.util.Screen
-import com.aileenyx.wikigrimoire.util.tabs
+import com.aileenyx.wikigrimoire.components.Screen
+import com.aileenyx.wikigrimoire.components.tabs
+import com.aileenyx.wikigrimoire.util.migrateTemplates
+import com.aileenyx.wikigrimoire.util.populateTemplates
 
 class MainActivity : ComponentActivity() {
+    // Update the `onCreate` method in `MainActivity.kt`
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        if (isFirstLaunch(this)) {
+            migrateTemplates(this)
+            setFirstLaunchCompleted(this)
+        }
+        populateTemplates(this)
         setContent {
             WikiGrimoireTheme() {
                 val navController = rememberNavController()
@@ -41,20 +51,15 @@ class MainActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize(), bottomBar = {
                     NavigationBar {
                         tabs.map { item ->
-                            val isSelected = item.screen == navBackStackEntry?.toScreen()
                             NavigationBarItem(
-                                selected = isSelected,
+                                selected = false,
                                 onClick = {
                                     navController.navigate(item.screen)
                                 },
                                 icon = {
                                     Icon(
                                         imageVector = item.icon,
-                                        contentDescription = null,
-                                        modifier = Modifier.then(
-                                            if (isSelected) Modifier else Modifier
-                                        ),
-                                        tint = if (isSelected) MaterialTheme.colorScheme.primary else LocalContentColor.current
+                                        contentDescription = null
                                     )
                                 }
                             )
@@ -83,18 +88,15 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
+private fun isFirstLaunch(context: Context): Boolean {
+    val sharedPreferences = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+    return sharedPreferences.getBoolean("first_launch", true)
 }
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    WikiGrimoireTheme {
-        Greeting("Android")
+private fun setFirstLaunchCompleted(context: Context) {
+    val sharedPreferences = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+    with(sharedPreferences.edit()) {
+        putBoolean("first_launch", false)
+        apply()
     }
 }

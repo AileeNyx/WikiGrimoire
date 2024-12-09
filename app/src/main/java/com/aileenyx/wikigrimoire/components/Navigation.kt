@@ -1,12 +1,12 @@
-package com.aileenyx.wikigrimoire.util
+package com.aileenyx.wikigrimoire.components
+
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.navigation.NavBackStackEntry
-import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
+
 
 @Serializable
 sealed class Screen {
@@ -18,23 +18,6 @@ sealed class Screen {
 
     @Serializable
     data object CreateScreen : Screen()
-
-    @Serializable
-    data object LogInScreen : Screen()
-
-    @Serializable
-    data object SettingsScreen : Screen()
-
-    @Serializable
-    data object ProfileScreen : Screen()
-
-    fun NavBackStackEntry.toScreen(): Screen? =
-        when (destination.route?.substringAfterLast(".")?.substringBefore("/")) {
-            "HomeScreen" -> toRoute<HomeScreen>()
-            "SearchScreen" -> toRoute<SearchScreen>()
-            "CreateScreen" -> toRoute<CreateScreen>()
-            else -> null
-        }
 }
 
 data class NavItem(
@@ -60,4 +43,3 @@ val tabs = listOf(
         screen = Screen.CreateScreen,
     )
 )
-

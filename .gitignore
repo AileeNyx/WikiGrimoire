@@ -1,5 +1,5 @@
 *.iml
-*env*
+*.env
 .gradle
 /local.properties
 /.idea/caches
@@ -14,3 +14,4 @@
 .externalNativeBuild
 .cxx
 local.properties
+app/src/main/assets/env
