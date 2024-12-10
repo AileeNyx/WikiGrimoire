@@ -11,16 +11,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.Dp
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.material.icons.filled.AccountCircle
+import com.aileenyx.wikigrimoire.components.LocalNavController
+import com.aileenyx.wikigrimoire.components.Screen
 
 @Composable
 fun GrimoireHeader(
-    title: String,
     showProfilePicture: Boolean,
-    showBackArrow: Boolean,
-    onProfileClick: () -> Unit,
-    onBackClick: () -> Unit,
-    headerHeight: Dp = 56.dp // Default height of TopAppBar
+    showBackArrow: Boolean
 ) {
+    val navController = LocalNavController.current
+    val title = "Wiki Grimoire"
+
     Column {
         TopAppBar(
             title = { Text(text = title, modifier = Modifier.fillMaxWidth().wrapContentWidth(Alignment.CenterHorizontally)) },
@@ -30,19 +32,23 @@ fun GrimoireHeader(
                         imageVector = Icons.Filled.ArrowBack,
                         contentDescription = null,
                         modifier = Modifier.size(24.dp)
+                        .clickable {
+                            navController.navigate(Screen.HomeScreen)
+                        }
                     )
                 }
             } else null,
             actions = {
-                /*if (showProfilePicture) {
-                    Image(
-                        painter = painterResource(id = R.drawable.ic_profile_picture),
-                        contentDescription = "Profile",
-                        modifier = Modifier
-                            .size(40.dp)
-                            .clickable { onProfileClick() }
+                if (showProfilePicture) {
+                    Icon(
+                        imageVector = Icons.Filled.AccountCircle,
+                        contentDescription = null,
+                        modifier = Modifier.size(24.dp)
+                            .clickable {
+                                navController.navigate(Screen.ProfileScreen)
+                            }
                     )
-                }*/
+                }
             },
             modifier = Modifier.fillMaxWidth()
         )

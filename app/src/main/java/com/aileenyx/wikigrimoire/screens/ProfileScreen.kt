@@ -4,7 +4,6 @@ import GrimoireHeader
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
@@ -18,28 +17,21 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
-
-fun ProfileHandler(navController: NavController) {
-    navController.navigate("login")
-}
+import com.aileenyx.wikigrimoire.components.LocalNavController
+import com.aileenyx.wikigrimoire.components.Screen
+import com.aileenyx.wikigrimoire.util.getUsername
+import com.aileenyx.wikigrimoire.util.signOut
 
 @Composable
-fun ProfileScreen(
-    profilePicture: Int,
-    name: String,
-    email: String,
-    onSyncDataClick: () -> Unit,
-    onLogOutClick: () -> Unit,
-    navController: NavController
-) {
+fun ProfileScreen() {
+    val user = getUsername()
+    val navController = LocalNavController.current
+
     Scaffold(
         topBar = {
             GrimoireHeader(
-                title = "Wiki Grimoire",
                 showProfilePicture = false,
-                showBackArrow = true,
-                onProfileClick = { /* Handle profile click */ },
-                onBackClick = { navController.navigate("home") }
+                showBackArrow = true
             )
         }
     ) { innerPadding ->
@@ -50,27 +42,14 @@ fun ProfileScreen(
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Image(
-                painter = painterResource(id = profilePicture),
-                contentDescription = "Profile Picture",
-                modifier = Modifier
-                    .size(100.dp)
-                    .clickable { /* Handle profile picture click */ }
-            )
             Spacer(modifier = Modifier.height(16.dp))
-            Text(text = name, fontSize = 24.sp, color = Color.Black)
+            Text(text = user!!, fontSize = 24.sp, color = Color.Black)
             Spacer(modifier = Modifier.height(8.dp))
-            Text(text = email, fontSize = 16.sp, color = Color.Gray)
-            Spacer(modifier = Modifier.height(32.dp))
             Button(
-                onClick = onSyncDataClick,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Sync Data")
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(
-                onClick = onLogOutClick,
+                onClick = {
+                    signOut()
+                    navController.navigate(Screen.LoginScreen)
+                },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Log Out")

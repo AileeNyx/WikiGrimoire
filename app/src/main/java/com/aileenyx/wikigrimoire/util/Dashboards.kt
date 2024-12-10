@@ -9,7 +9,7 @@ val wikis = mutableListOf<Wiki>()
 
 suspend fun updateList(context: Context) {
     try {
-        val query = "SELECT name, url, bannerImage, dashboardStatus FROM wiki WHERE dashboardStatus = true"
+        val query = "SELECT name, url, bannerImage, dashboardStatus, isDefault FROM wiki WHERE dashboardStatus = true"
         val result = fetchData(context, query)
         Log.d("updateList", "Query executed successfully with result: $result")
 
@@ -19,6 +19,7 @@ suspend fun updateList(context: Context) {
                 name = row["name"] as String
                 url = row["url"] as String
                 bannerImage = row["bannerImage"] as String
+                isTemplate = row["isDefault"] == 1
             }
             wikis.add(wiki)
         }

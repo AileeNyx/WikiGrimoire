@@ -8,8 +8,8 @@ val templates = HashMap<Int, String>()
 
 fun migrateTemplates(context: Context) {
     val dbHelper = DBHelper(context)
-    dbHelper.insertWiki("Minecraft", "https://minecraft.wiki/", "template-minecraft.webp", false, true)
-    dbHelper.insertWiki("Terraria", "https://terraria.fandom.com/wiki/Terraria_Wiki", "template-terraria.jpg", false, true)
+    dbHelper.insertWiki("Minecraft", "https://minecraft.wiki/", "template-minecraft", false, true)
+    dbHelper.insertWiki("Terraria", "https://terraria.fandom.com/wiki/Terraria_Wiki", "template-terraria", false, true)
 }
 
 fun populateTemplates(context: Context) {

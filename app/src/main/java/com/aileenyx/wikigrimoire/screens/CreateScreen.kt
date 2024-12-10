@@ -1,6 +1,8 @@
 package com.aileenyx.wikigrimoire.screens
 
 import GrimoireHeader
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -22,37 +24,48 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
 import androidx.compose.material3.Scaffold
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.res.imageResource
+import com.aileenyx.wikigrimoire.R
+import com.aileenyx.wikigrimoire.util.generateImageFileName
+import com.aileenyx.wikigrimoire.util.getImageFromName
+import com.aileenyx.wikigrimoire.util.saveBitmapAsWebp
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import com.aileenyx.wikigrimoire.components.LocalNavController
+import com.aileenyx.wikigrimoire.components.Screen
+import kotlinx.coroutines.withContext
 
 @Composable
 fun CreateScreen() {
-    var selectedOption by remember { mutableStateOf("Preset") }
+    val navController = LocalNavController.current
     var selectedTemplateId by remember { mutableStateOf(-1) }
     var customName by remember { mutableStateOf("") }
     var customUrl by remember { mutableStateOf("") }
-    var customBannerImage by remember { mutableStateOf("") }
+    var customBannerImage by remember { mutableStateOf<Bitmap?>(null) }
+    var selectedIndex by remember { mutableStateOf(0) }
+    var useCustomImage by remember { mutableStateOf(true) }
+    var loading by remember { mutableStateOf(false) }
     val dbHelper = DBHelper(LocalContext.current)
+    val context = LocalContext.current
+    val snackbarHostState = remember { SnackbarHostState() }
 
     Scaffold(
         topBar = {
             GrimoireHeader(
-                title = "Wiki Grimoire",
                 showProfilePicture = true,
-                showBackArrow = false,
-                onProfileClick = { /* Handle profile click */ },
-                onBackClick = { /* Handle back click */ }
+                showBackArrow = false
             )
-        }
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { innerPadding ->
         Column(modifier = Modifier.fillMaxSize().padding(innerPadding).padding(16.dp)) {
-            SegmentedButton(
-                options = listOf("Preset", "Custom"),
-                selectedOption = selectedOption,
-                onOptionSelected = { selectedOption = it }
-            )
+            SingleChoiceSegmentedButton(selectedIndex = selectedIndex, onSelectedIndexChange = { selectedIndex = it })
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            if (selectedOption == "Preset") {
+            if (selectedIndex == 0) {
                 TemplateDropdown(
                     templates = templates,
                     selectedTemplateId = selectedTemplateId,
@@ -65,46 +78,79 @@ fun CreateScreen() {
                     url = customUrl,
                     onUrlChange = { customUrl = it },
                     bannerImage = customBannerImage,
-                    onBannerImageChange = { customBannerImage = it }
+                    onBannerImageChange = { customBannerImage = it },
+                    useCustomImage = useCustomImage,
+                    onUseCustomImageChange = { useCustomImage = it },
                 )
             }
 
             Spacer(modifier = Modifier.weight(1f))
 
-            Button(
-                onClick = {
-                    if (selectedOption == "Preset" && selectedTemplateId != -1) {
-                        dbHelper.toggleDashboardStatus(selectedTemplateId, true)
-                    } else if (selectedOption == "Custom" && customName.isNotEmpty() && customUrl.isNotEmpty() && customBannerImage.isNotEmpty()) {
-                        dbHelper.insertWiki(
-                            name = customName,
-                            url = customUrl,
-                            bannerImage = customBannerImage,
-                            dashboardStatus = true
-                        )
-                    }
-                },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Add")
+            if (loading) {
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+            } else {
+                Button(
+                    onClick = {
+                        if (selectedIndex == 0 && selectedTemplateId != -1) {
+                            loading = true
+                            CoroutineScope(Dispatchers.IO).launch {
+                                dbHelper.toggleDashboardStatus(selectedTemplateId, true)
+                                withContext(Dispatchers.Main) {
+                                    loading = false
+                                    navController.previousBackStackEntry?.savedStateHandle?.set("snackbarMessage", "Wiki added successfully!")
+                                    navController.navigate(Screen.HomeScreen)
+                                }
+                            }
+                        } else if (selectedIndex == 1 && customName.isNotEmpty() && customUrl.isNotEmpty() && (customBannerImage != null || !useCustomImage)) {
+                            loading = true
+                            CoroutineScope(Dispatchers.IO).launch {
+                                var fileName = "template-default"
+                                if (customBannerImage != null) {
+                                    fileName = generateImageFileName(customName)
+                                    saveBitmapAsWebp(context, customBannerImage!!, fileName)
+                                }
+                                dbHelper.insertWiki(
+                                    name = customName,
+                                    url = customUrl,
+                                    bannerImage = fileName,
+                                    dashboardStatus = true
+                                )
+                                withContext(Dispatchers.Main) {
+                                    loading = false
+                                    navController.previousBackStackEntry?.savedStateHandle?.set("snackbarMessage", "Wiki added successfully!")
+                                    navController.navigate(Screen.HomeScreen)
+                                }
+                            }
+                        } else {
+                            CoroutineScope(Dispatchers.Main).launch {
+                                snackbarHostState.showSnackbar("Please fill in all fields.")
+                            }
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Add")
+                }
             }
         }
     }
 }
 
 @Composable
-fun SegmentedButton(options: List<String>, selectedOption: String, onOptionSelected: (String) -> Unit) {
-    Row {
-        options.forEach { option ->
-            Button(
-                onClick = { onOptionSelected(option) },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = if (selectedOption == option) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
+fun SingleChoiceSegmentedButton(selectedIndex: Int, onSelectedIndexChange: (Int) -> Unit, modifier: Modifier = Modifier) {
+    val options = listOf("Preset", "Custom")
+
+    SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+        options.forEachIndexed { index, label ->
+            SegmentedButton(
+                shape = SegmentedButtonDefaults.itemShape(
+                    index = index,
+                    count = options.size
                 ),
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(option)
-            }
+                onClick = { onSelectedIndexChange(index) },
+                selected = index == selectedIndex,
+                label = { Text(label) }
+            )
         }
     }
 }
@@ -149,56 +195,72 @@ fun TemplateDropdown(templates: HashMap<Int, String>, selectedTemplateId: Int, o
 }
 
 @Composable
-fun CustomWikiFields(name: String, onNameChange: (String) -> Unit, url: String, onUrlChange: (String) -> Unit, bannerImage: String, onBannerImageChange: (String) -> Unit) {
+fun CustomWikiFields(
+    name: String,
+    onNameChange: (String) -> Unit,
+    url: String,
+    onUrlChange: (String) -> Unit,
+    bannerImage: Bitmap?,
+    onBannerImageChange: (Bitmap?) -> Unit,
+    useCustomImage: Boolean,
+    onUseCustomImageChange: (Boolean) -> Unit
+) {
     val context = LocalContext.current
     var imageUri by remember { mutableStateOf<Uri?>(null) }
-    var imageBitmap by remember { mutableStateOf<ImageBitmap?>(null) }
+    var imageBitmap by remember { mutableStateOf<Bitmap?>(null) }
 
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         uri?.let {
             imageUri = it
-            val inputStream: InputStream? = context.contentResolver.openInputStream(it)
-            val file = File(context.filesDir, "assets/images/${System.currentTimeMillis()}.jpg")
-            val outputStream = FileOutputStream(file)
-            inputStream?.copyTo(outputStream)
-            inputStream?.close()
-            outputStream.close()
-            onBannerImageChange(file.name)
-            imageBitmap = MediaStore.Images.Media.getBitmap(context.contentResolver, it).asImageBitmap()
+            try {
+                val inputStream: InputStream? = context.contentResolver.openInputStream(it)
+                val bitmap = BitmapFactory.decodeStream(inputStream)
+                inputStream?.close()
+                imageBitmap = bitmap
+                onBannerImageChange(imageBitmap)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
 
     Column {
-        BasicTextField(
+        TextField(
             value = name,
-            onValueChange = onNameChange,
-            modifier = Modifier.fillMaxWidth().padding(8.dp),
-            decorationBox = { innerTextField ->
-                Box(modifier = Modifier.padding(8.dp)) {
-                    if (name.isEmpty()) Text("Name")
-                    innerTextField()
-                }
-            }
+            onValueChange = { if (it.length <= 36) onNameChange(it) },
+            label = { Text("Name") },
+            modifier = Modifier.fillMaxWidth().padding(8.dp)
         )
-        BasicTextField(
+        TextField(
             value = url,
-            onValueChange = onUrlChange,
-            modifier = Modifier.fillMaxWidth().padding(8.dp),
-            decorationBox = { innerTextField ->
-                Box(modifier = Modifier.padding(8.dp)) {
-                    if (url.isEmpty()) Text("URL")
-                    innerTextField()
-                }
-            }
+            onValueChange = { if (it.length <= 512) onUrlChange(it) },
+            label = { Text("URL") },
+            modifier = Modifier.fillMaxWidth().padding(8.dp)
         )
-        Box(modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-            .clickable { launcher.launch("image/*") }) {
-            if (imageBitmap != null) {
-                Image(bitmap = imageBitmap!!, contentDescription = null, modifier = Modifier.fillMaxWidth().height(200.dp))
-            } else {
-                Text("Select Banner Image")
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text("Use Custom Image")
+            Spacer(modifier = Modifier.weight(1f))
+            Switch(
+                checked = useCustomImage,
+                onCheckedChange = onUseCustomImageChange
+            )
+        }
+        if (useCustomImage) {
+            Button(
+                onClick = { launcher.launch("image/*") },
+                modifier = Modifier.fillMaxWidth().padding(8.dp)
+            ) {
+                Text(if (imageBitmap != null) "Change Banner Image" else "Select Banner Image")
+            }
+            imageBitmap?.let {
+                Image(
+                    bitmap = it.asImageBitmap(),
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxWidth().height(200.dp)
+                )
             }
         }
     }

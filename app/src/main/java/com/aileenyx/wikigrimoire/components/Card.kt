@@ -1,3 +1,5 @@
+package com.aileenyx.wikigrimoire.components
+
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.net.Uri
@@ -21,32 +23,27 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.aileenyx.wikigrimoire.R
+import com.aileenyx.wikigrimoire.util.getImageFromName
 
 @Composable
 fun WikiCard(
     name: String,
     url: String,
     image: String,
+    isTemplate: Boolean,
     isLarge: Boolean
 ) {
     val context = LocalContext.current
     val cardHeight = if (isLarge) 200.dp else 100.dp
-    val imageHeight = if (isLarge) 133.dp else 50.dp
+    val imageHeight = if (isLarge) 133.dp else 40.dp
+    val textStyle = if (isLarge) MaterialTheme.typography.headlineMedium else MaterialTheme.typography.headlineSmall
 
-    val imagePath = "images/$image"
-    Log.d("imagePath:", imagePath)
-    val imageBitmap: ImageBitmap = remember {
-        try {
-            context.assets.open(imagePath).use { inputStream ->
-                BitmapFactory.decodeStream(inputStream)?.asImageBitmap()
-            }
-        } catch (e: Exception) {
-            null
-        }!!
-    }
+    val imageBitmap = remember(image) { getImageFromName(image, isTemplate, context) }
 
-    val imagePainter = imageBitmap.let { androidx.compose.ui.graphics.painter.BitmapPainter(it) }
+    val imagePainter = imageBitmap.let { androidx.compose.ui.graphics.painter.BitmapPainter(it!!) }
 
     Card(
         modifier = Modifier
@@ -54,7 +51,12 @@ fun WikiCard(
             .height(cardHeight)
             .padding(8.dp)
             .clickable {
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                val validUrl = if (url.startsWith("http://") || url.startsWith("https://")) {
+                    url
+                } else {
+                    "http://$url"
+                }
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(validUrl))
                 context.startActivity(intent)
             },
         elevation = CardDefaults.cardElevation(8.dp)
@@ -72,12 +74,13 @@ fun WikiCard(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(8.dp),
+                    .padding(8.dp, 3.dp, 8.dp, 8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
                     text = name,
-                    style = MaterialTheme.typography.headlineMedium
+                    style = textStyle,
+                    modifier = Modifier.offset(y = (-4).dp) // Adjust the offset as needed
                 )
                 Icon(
                     imageVector = Icons.Filled.ArrowForward,

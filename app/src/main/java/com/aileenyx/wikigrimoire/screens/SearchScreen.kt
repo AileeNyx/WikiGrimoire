@@ -1,7 +1,6 @@
 package com.aileenyx.wikigrimoire.screens
 
 import GrimoireHeader
-import WikiCard
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -13,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.material3.Text
 import com.aileenyx.wikigrimoire.util.wikis
 import androidx.compose.material3.Scaffold
+import com.aileenyx.wikigrimoire.components.WikiCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -26,11 +26,8 @@ fun SearchScreen(modifier: Modifier = Modifier) {
     Scaffold(
         topBar = {
             GrimoireHeader(
-                title = "Wiki Grimoire",
                 showProfilePicture = true,
-                showBackArrow = false,
-                onProfileClick = { /* Handle profile click */ },
-                onBackClick = { /* Handle back click */ }
+                showBackArrow = false
             )
         }
     ) { innerPadding ->
@@ -51,6 +48,7 @@ fun SearchScreen(modifier: Modifier = Modifier) {
                     name = wiki.name,
                     url = wiki.url,
                     image = wiki.bannerImage,
+                    isTemplate = wiki.isTemplate,
                     isLarge = false
                 )
             }

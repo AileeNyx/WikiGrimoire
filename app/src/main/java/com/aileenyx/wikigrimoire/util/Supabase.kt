@@ -20,6 +20,7 @@ import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.auth.providers.builtin.IDToken
 import io.github.jan.supabase.exceptions.RestException
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.security.MessageDigest
 import java.util.UUID
 
@@ -117,4 +118,43 @@ fun GoogleSignInButton() {
     ) {
         Text("Sign in with Google")
     }
+}
+
+fun isActiveSession(): Boolean {
+    val session = supabase.auth.currentSessionOrNull()
+    return session != null
+}
+
+fun getUsername(): String? {
+    if (isActiveSession()) {
+        val supabaseClient = supabase
+        var username: String? = null
+        runBlocking {
+            val user = supabase.auth.retrieveUserForCurrentSession(updateSession = true)
+            username = user.email
+        }
+        return username
+    } else {
+        return null
+    }
+}
+
+fun getUserId() :String? {
+    if (isActiveSession()) {
+        var userId: String? = null
+        runBlocking {
+            val user = supabase.auth.retrieveUserForCurrentSession(updateSession = true)
+            userId = user.id
+        }
+        return userId
+    } else {
+        return null
+    }
+}
+
+fun signOut() {
+    runBlocking {
+        supabase.auth.signOut()
+    }
+    userSingedIn = false
 }
