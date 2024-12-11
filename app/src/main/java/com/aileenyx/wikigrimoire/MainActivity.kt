@@ -27,9 +27,11 @@ import com.aileenyx.wikigrimoire.ui.theme.WikiGrimoireTheme
 import com.aileenyx.wikigrimoire.components.Screen
 import com.aileenyx.wikigrimoire.components.tabs
 import com.aileenyx.wikigrimoire.screens.ProfileScreen
+import com.aileenyx.wikigrimoire.util.getSessionToken
 import com.aileenyx.wikigrimoire.util.isActiveSession
 import com.aileenyx.wikigrimoire.util.migrateTemplates
 import com.aileenyx.wikigrimoire.util.populateTemplates
+import com.aileenyx.wikigrimoire.util.storeSessionToken
 import java.io.File
 
 class MainActivity : ComponentActivity() {
@@ -51,10 +53,10 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 NavControllerProvider.navController = navController
 
-                var isActiveSession by remember { mutableStateOf(isActiveSession()) }
+                var isActiveSession by remember { mutableStateOf(getSessionToken(this@MainActivity) != null) }
 
                 fun updateSessionStatus() {
-                    isActiveSession = isActiveSession()
+                    isActiveSession = getSessionToken(this@MainActivity) != null
                 }
 
                 CompositionLocalProvider(LocalNavController provides navController) {
@@ -97,7 +99,10 @@ class MainActivity : ComponentActivity() {
                                     CreateScreen()
                                 }
                                 composable<Screen.LoginScreen> {
-                                    LoginScreen(onLoginSuccess = { updateSessionStatus() })
+                                    LoginScreen(onLoginSuccess = {
+                                        storeSessionToken(this@MainActivity, "your_session_token")
+                                        updateSessionStatus()
+                                    })
                                 }
                                 composable<Screen.ProfileScreen> {
                                     ProfileScreen()

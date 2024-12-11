@@ -1,6 +1,7 @@
 package com.aileenyx.wikigrimoire.util
 
 import android.content.Context
+import android.util.Log
 
 val templates = HashMap<Int, String>()
 
@@ -16,5 +17,6 @@ fun populateTemplates(context: Context) {
     templates.clear()
     result.forEach { row ->
         templates.put(row["ID"] as Int, row[Contract.Wiki.COLUMN_NAME_NAME] as String)
+        Log.d("Templates", "Id: ${row["ID"]}")
     }
 }

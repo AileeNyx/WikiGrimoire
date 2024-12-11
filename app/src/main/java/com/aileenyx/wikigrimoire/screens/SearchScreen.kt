@@ -37,11 +37,11 @@ fun SearchScreen(modifier: Modifier = Modifier) {
             SearchBar(
                 query = searchQuery.value,
                 onQueryChange = { searchQuery.value = it },
-                onSearch = { /* Handle search action */ },
+                onSearch = {},
                 active = false,
-                onActiveChange = { /* Handle active state change */ },
+                onActiveChange = {},
                 placeholder = { Text("Search") },
-                content = { /* Additional content if needed */ }
+                content = {}
             )
             for (wiki in filteredWikis) {
                 WikiCard(

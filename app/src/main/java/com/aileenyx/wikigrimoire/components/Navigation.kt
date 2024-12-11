@@ -10,9 +10,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavHostController
 import kotlinx.serialization.Serializable
 
-val LocalNavController = staticCompositionLocalOf<NavHostController> {
-    error("NavController not provided")
-}
+val LocalNavController = staticCompositionLocalOf<NavHostController> { error("NavController not provided") }
 
 object NavControllerProvider {
     @SuppressLint("StaticFieldLeak")

@@ -96,7 +96,6 @@ fun CreateScreen() {
                                 dbHelper.toggleDashboardStatus(selectedTemplateId, true)
                                 withContext(Dispatchers.Main) {
                                     loading = false
-                                    navController.previousBackStackEntry?.savedStateHandle?.set("snackbarMessage", "Wiki added successfully!")
                                     navController.navigate(Screen.HomeScreen)
                                 }
                             }

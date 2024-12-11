@@ -17,6 +17,7 @@ fun GrimoireHeader(
     showBackArrow: Boolean
 ) {
     val navController = LocalNavController.current
+
     val title = "Wiki Grimoire"
 
     Column {

@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
+import androidx.compose.ui.platform.LocalContext
 import com.aileenyx.wikigrimoire.components.LocalNavController
 import com.aileenyx.wikigrimoire.components.Screen
 import com.aileenyx.wikigrimoire.util.getUsername
@@ -22,6 +23,7 @@ import com.aileenyx.wikigrimoire.util.signOut
 fun ProfileScreen() {
     val user = getUsername()
     val navController = LocalNavController.current
+    val localContext = LocalContext.current
 
     Scaffold(
         topBar = {
@@ -43,7 +45,7 @@ fun ProfileScreen() {
             Spacer(modifier = Modifier.height(8.dp))
             Button(
                 onClick = {
-                    signOut()
+                    signOut(localContext)
                     navController.navigate(Screen.LoginScreen)
                 },
                 modifier = Modifier.fillMaxWidth()

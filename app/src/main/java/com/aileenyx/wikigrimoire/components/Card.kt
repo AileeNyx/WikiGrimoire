@@ -29,13 +29,13 @@ fun WikiCard(
     isLarge: Boolean
 ) {
     val context = LocalContext.current
+
+    val imageBitmap = remember(image) { getImageFromName(image, isTemplate, context) }
+    val imagePainter = imageBitmap.let { androidx.compose.ui.graphics.painter.BitmapPainter(it!!) }
+
     val cardHeight = if (isLarge) 200.dp else 100.dp
     val imageHeight = if (isLarge) 133.dp else 40.dp
     val textStyle = if (isLarge) MaterialTheme.typography.headlineMedium else MaterialTheme.typography.headlineSmall
-
-    val imageBitmap = remember(image) { getImageFromName(image, isTemplate, context) }
-
-    val imagePainter = imageBitmap.let { androidx.compose.ui.graphics.painter.BitmapPainter(it!!) }
 
     Card(
         modifier = Modifier

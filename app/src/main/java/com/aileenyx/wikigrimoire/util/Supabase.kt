@@ -1,5 +1,7 @@
 package com.aileenyx.wikigrimoire.util
 
+import android.content.Context
+import android.content.SharedPreferences
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,7 +34,6 @@ val dotenv = dotenv {
 val supabaseUrl: String = dotenv["SUPABASE_URL"]
 val supabaseKey: String = dotenv["SUPABASE_KEY"]
 val webGoogleClientId: String = dotenv["WEB_GOOGLE_CLIENT_ID"]
-var userSingedIn: Boolean = false
 
 val supabase = createSupabaseClient(supabaseUrl, supabaseKey) {
     install(Auth)
@@ -100,7 +101,6 @@ fun GoogleSignInButton() {
 
                 val session = supabase.auth.currentSessionOrNull()
                 print(session)
-                userSingedIn = true
             } catch (e: GetCredentialException) {
                 // Handle GetCredentialException thrown by `credentialManager.getCredential()`
             } catch (e: GoogleIdTokenParsingException) {
@@ -152,9 +152,30 @@ fun getUserId() :String? {
     }
 }
 
-fun signOut() {
+fun storeSessionToken(context: Context, token: String) {
+    val sharedPreferences: SharedPreferences = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+    with(sharedPreferences.edit()) {
+        putString("session_token", token)
+        apply()
+    }
+}
+
+fun getSessionToken(context: Context): String? {
+    val sharedPreferences: SharedPreferences = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+    return sharedPreferences.getString("session_token", null)
+}
+
+fun clearSessionToken(context: Context) {
+    val sharedPreferences: SharedPreferences = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+    with(sharedPreferences.edit()) {
+        remove("session_token")
+        apply()
+    }
+}
+
+fun signOut(context: Context) {
     runBlocking {
         supabase.auth.signOut()
     }
-    userSingedIn = false
+    clearSessionToken(context)
 }

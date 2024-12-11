@@ -27,24 +27,14 @@ fun HomeScreen() {
     val wikisState = remember { mutableStateListOf<Wiki>() }
     val navBackStackEntry = LocalContext.current as? androidx.navigation.NavBackStackEntry
     val snackbarHostState = remember { SnackbarHostState() }
-    val modifier = Modifier.padding()
 
 
     LaunchedEffect(navBackStackEntry) {
-        try {
-            withContext(Dispatchers.IO) {
-                updateList(context)
-            }
-            wikisState.clear()
-            wikisState.addAll(wikis)
-            Log.d("HomeScreen", "updateList called successfully: $wikisState")
-        } catch (e: Exception) {
-            Log.e("HomeScreen", "Error calling updateList", e)
+        withContext(Dispatchers.IO) {
+            updateList(context)
         }
-        navBackStackEntry?.savedStateHandle?.get<String>("snackbarMessage")?.let { message ->
-            snackbarHostState.showSnackbar(message)
-            navBackStackEntry.savedStateHandle.remove<String>("snackbarMessage")
-        }
+        wikisState.clear()
+        wikisState.addAll(wikis)
     }
 
     Scaffold(
@@ -56,13 +46,11 @@ fun HomeScreen() {
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { innerPadding ->
-        Column(modifier = modifier.padding(innerPadding)) {
+        Column(modifier = Modifier.padding(innerPadding)) {
             val dbHelper = DBHelper
+
             var list = dbHelper.fetchData(context, "SELECT * FROM wiki")
-            for (row in list) {
-                Log.d("HomeScreen", "Printing row: $row")
-            }
-            Log.d("Database", "Current Database: ")
+
             for (wiki in wikisState) {
                 Log.d("HomeScreen", "Printing wiki: ${wiki.name}")
                 WikiCard(
