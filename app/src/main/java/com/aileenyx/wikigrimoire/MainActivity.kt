@@ -1,4 +1,3 @@
-// File: app/src/main/java/com/aileenyx/wikigrimoire/MainActivity.kt
 package com.aileenyx.wikigrimoire
 
 import android.content.Context
@@ -28,7 +27,6 @@ import com.aileenyx.wikigrimoire.ui.theme.WikiGrimoireTheme
 import com.aileenyx.wikigrimoire.components.Screen
 import com.aileenyx.wikigrimoire.components.tabs
 import com.aileenyx.wikigrimoire.screens.ProfileScreen
-import com.aileenyx.wikigrimoire.screens.WebViewScreen
 import com.aileenyx.wikigrimoire.util.isActiveSession
 import com.aileenyx.wikigrimoire.util.migrateTemplates
 import com.aileenyx.wikigrimoire.util.populateTemplates
@@ -54,6 +52,10 @@ class MainActivity : ComponentActivity() {
                 NavControllerProvider.navController = navController
 
                 var isActiveSession by remember { mutableStateOf(isActiveSession()) }
+
+                fun updateSessionStatus() {
+                    isActiveSession = isActiveSession()
+                }
 
                 CompositionLocalProvider(LocalNavController provides navController) {
                     Scaffold(modifier = Modifier.fillMaxSize(), bottomBar = {
@@ -95,10 +97,7 @@ class MainActivity : ComponentActivity() {
                                     CreateScreen()
                                 }
                                 composable<Screen.LoginScreen> {
-                                    LoginScreen()
-                                    LaunchedEffect(Unit) {
-                                        isActiveSession = isActiveSession()
-                                    }
+                                    LoginScreen(onLoginSuccess = { updateSessionStatus() })
                                 }
                                 composable<Screen.ProfileScreen> {
                                     ProfileScreen()

@@ -40,11 +40,11 @@ import kotlinx.coroutines.withContext
 @Composable
 fun CreateScreen() {
     val navController = LocalNavController.current
-    var selectedTemplateId by remember { mutableStateOf(-1) }
+    var selectedTemplateId by remember { mutableIntStateOf(-1) }
     var customName by remember { mutableStateOf("") }
     var customUrl by remember { mutableStateOf("") }
     var customBannerImage by remember { mutableStateOf<Bitmap?>(null) }
-    var selectedIndex by remember { mutableStateOf(0) }
+    var selectedIndex by remember { mutableIntStateOf(0) }
     var useCustomImage by remember { mutableStateOf(true) }
     var loading by remember { mutableStateOf(false) }
     val dbHelper = DBHelper(LocalContext.current)
@@ -77,7 +77,6 @@ fun CreateScreen() {
                     onNameChange = { customName = it },
                     url = customUrl,
                     onUrlChange = { customUrl = it },
-                    bannerImage = customBannerImage,
                     onBannerImageChange = { customBannerImage = it },
                     useCustomImage = useCustomImage,
                     onUseCustomImageChange = { useCustomImage = it },
@@ -137,7 +136,7 @@ fun CreateScreen() {
 }
 
 @Composable
-fun SingleChoiceSegmentedButton(selectedIndex: Int, onSelectedIndexChange: (Int) -> Unit, modifier: Modifier = Modifier) {
+fun SingleChoiceSegmentedButton(selectedIndex: Int, onSelectedIndexChange: (Int) -> Unit) {
     val options = listOf("Preset", "Custom")
 
     SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
@@ -166,7 +165,7 @@ fun TemplateDropdown(templates: HashMap<Int, String>, selectedTemplateId: Int, o
         onExpandedChange = { expanded = !expanded }
     ) {
         TextField(
-            value = selectedTemplate ?: "Select a template",
+            value = selectedTemplate,
             onValueChange = {},
             readOnly = true,
             trailingIcon = {
@@ -200,7 +199,6 @@ fun CustomWikiFields(
     onNameChange: (String) -> Unit,
     url: String,
     onUrlChange: (String) -> Unit,
-    bannerImage: Bitmap?,
     onBannerImageChange: (Bitmap?) -> Unit,
     useCustomImage: Boolean,
     onUseCustomImageChange: (Boolean) -> Unit

@@ -1,8 +1,6 @@
 package com.aileenyx.wikigrimoire.util
 
 import android.content.Context
-import androidx.compose.ui.platform.LocalContext
-import java.util.Dictionary
 
 val templates = HashMap<Int, String>()
 
