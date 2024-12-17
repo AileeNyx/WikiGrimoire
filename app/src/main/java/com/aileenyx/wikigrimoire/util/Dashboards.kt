@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import com.aileenyx.wikigrimoire.beans.Wiki
 import com.aileenyx.wikigrimoire.util.DBHelper.Companion.fetchData
+import io.github.jan.supabase.postgrest.from
 
 val wikis = mutableListOf<Wiki>()
 
@@ -27,4 +28,7 @@ suspend fun updateList(context: Context) {
     } catch (e: Exception) {
         Log.e("updateList", "Error updating list", e)
     }
+
+    val city = supabase.from("cities").select().decodeSingle<Wiki>()
+
 }
