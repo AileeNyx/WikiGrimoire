@@ -26,6 +26,7 @@ import kotlinx.coroutines.runBlocking
 import java.security.MessageDigest
 import java.util.UUID
 
+//Variables de entorno
 val dotenv = dotenv {
     directory = "/assets"
     filename = "env"
@@ -40,6 +41,7 @@ val supabase = createSupabaseClient(supabaseUrl, supabaseKey) {
     install(Postgrest)
 }
 
+//Iniciado y creación de Sesión
 suspend fun signUpNewUser(newEmail: String, newPassword: String) {
     supabase.auth.signUpWith(Email) {
         email = newEmail
@@ -54,72 +56,7 @@ suspend fun signInWithEmail(userEmail: String, userPassword: String) {
     }
 }
 
-@Composable
-fun GoogleSignInButton() {
-    val coroutineScope = rememberCoroutineScope()
-    val context = LocalContext.current
-
-    val onClick: () -> Unit = {
-        val credentialManager = androidx.credentials.CredentialManager.create(context)
-
-        // Generate a nonce and hash it with sha-256
-        // Providing a nonce is optional but recommended
-        val rawNonce = UUID.randomUUID().toString() // Generate a random String. UUID should be sufficient, but can also be any other random string.
-        val bytes = rawNonce.toString().toByteArray()
-        val md = MessageDigest.getInstance("SHA-256")
-        val digest = md.digest(bytes)
-        val hashedNonce = digest.fold("") { str, it -> str + "%02x".format(it) } // Hashed nonce to be passed to Google sign-in
-
-
-        val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
-            .setFilterByAuthorizedAccounts(false)
-            .setServerClientId(webGoogleClientId)
-            .setNonce(hashedNonce) // Provide the nonce if you have one
-            .build()
-
-        val request: GetCredentialRequest = GetCredentialRequest.Builder()
-            .addCredentialOption(googleIdOption)
-            .build()
-
-        coroutineScope.launch {
-            try {
-                val result = credentialManager.getCredential(
-                    request = request,
-                    context = context,
-                )
-
-                val googleIdTokenCredential = GoogleIdTokenCredential
-                    .createFrom(result.credential.data)
-
-                val googleIdToken = googleIdTokenCredential.idToken
-
-                supabase.auth.signInWith(IDToken) {
-                    idToken = googleIdToken
-                    provider = Google
-                    nonce = rawNonce
-                }
-
-                val session = supabase.auth.currentSessionOrNull()
-                print(session)
-            } catch (e: GetCredentialException) {
-                // Handle GetCredentialException thrown by `credentialManager.getCredential()`
-            } catch (e: GoogleIdTokenParsingException) {
-                // Handle GoogleIdTokenParsingException thrown by `GoogleIdTokenCredential.createFrom()`
-            } catch (e: RestException) {
-                // Handle RestException thrown by Supabase
-            } catch (e: Exception) {
-                // Handle unknown exceptions
-            }
-        }
-    }
-
-    Button(
-        onClick = onClick,
-    ) {
-        Text("Sign in with Google")
-    }
-}
-
+//Getters de Información
 fun isActiveSession(): Boolean {
     val session = supabase.auth.currentSessionOrNull()
     return session != null
@@ -152,6 +89,7 @@ fun getUserId() :String? {
     }
 }
 
+//Guardado de la sesión
 fun storeSessionToken(context: Context, token: String) {
     val sharedPreferences: SharedPreferences = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
     with(sharedPreferences.edit()) {
@@ -173,9 +111,11 @@ fun clearSessionToken(context: Context) {
     }
 }
 
+//Cerrar sesión
 fun signOut(context: Context) {
     runBlocking {
         supabase.auth.signOut()
     }
     clearSessionToken(context)
 }
+
