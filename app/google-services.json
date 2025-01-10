@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "192607418823",
+    "project_id": "wiki-grimoire-f8f69",
+    "storage_bucket": "wiki-grimoire-f8f69.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:192607418823:android:6ebc086e23b0e5241b81e2",
+        "android_client_info": {
+          "package_name": "com.aileenyx.wikigrimoire"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "192607418823-5tm9esdhmr2baodud944h1k4qh3esln8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.aileenyx.wikigrimoire",
+            "certificate_hash": "f5ef28bcacdd44423129e034ca12ba28928829ed"
+          }
+        },
+        {
+          "client_id": "192607418823-aul4ms4md6gpctnglpmg9ftnk37t6pbh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCbKzHYrtqGJ8lP8EPB9VLqkbAzgUxVa1c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "192607418823-aul4ms4md6gpctnglpmg9ftnk37t6pbh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.jetbrains.kotlin.serialization)
     alias(libs.plugins.compose.compiler)
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -55,27 +56,37 @@ dependencies {
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
+    implementation (libs.androidx.material)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.compose.navigation)
     implementation(libs.kotlinx.serialization.json)
 
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
+    implementation(libs.google.firebase.auth)
+    implementation(libs.firebase.storage)
+    implementation(libs.play.services.auth)
+
     implementation(libs.ktor.client.android.z)
     implementation(libs.postgrest.kt)
     implementation(libs.auth.kt)
+
     implementation(libs.sqlite)
     implementation(libs.androidx.sqlite.bundled)
     implementation(libs.dotenv.kotlin)
     implementation (libs.ui)
-    implementation (libs.androidx.material)
+
     implementation (libs.ui.tooling.preview)
     implementation (libs.androidx.activity.compose.v172)
     implementation (libs.androidx.runtime.livedata)
     implementation(libs.androidx.credentials)
     implementation(libs.googleid)
+    implementation(libs.androidx.media3.common.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

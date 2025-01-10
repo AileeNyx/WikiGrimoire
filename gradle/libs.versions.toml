@@ -2,6 +2,9 @@
 activityComposeVersion = "1.9.3"
 agp = "8.7.3"
 authKt = "3.0.3"
+firebaseAuth = "23.1.0"
+firebaseBomVersion = "33.7.0"
+firebaseStorageVersion = "21.0.1"
 kotlin = "2.1.0"
 coreKtx = "1.15.0"
 junit = "4.13.2"
@@ -11,6 +14,7 @@ ktorClientEngine_zVersion = "3.0.2"
 lifecycleRuntimeKtx = "2.8.7"
 composeBom = "2024.11.00"
 material = "1.7.5"
+playServicesAuthVersion = "21.3.0"
 postgrestKt = "3.0.3"
 runtimeLivedata = "1.7.5"
 sqliteBundled = "2.5.0-alpha11"
@@ -20,6 +24,7 @@ ui = "1.7.5"
 uiToolingPreview = "1.7.5"
 credentialsVersion = "1.3.0"
 googleidVersion = "1.1.1"
+media3CommonKtxVersion = "1.5.1"
 
 [libraries]
 
@@ -29,6 +34,10 @@ androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = 
 androidx-material = { module = "androidx.compose.material:material", version.ref = "material" }
 androidx-runtime-livedata = { module = "androidx.compose.runtime:runtime-livedata", version.ref = "runtimeLivedata" }
 auth-kt = { module = "io.github.jan-tennert.supabase:auth-kt", version.ref = "authKt" }
+firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBomVersion" }
+firebase-storage = { module = "com.google.firebase:firebase-storage", version.ref = "firebaseStorageVersion" }
+google-firebase-auth = { module = "com.google.firebase:firebase-auth", version.ref = "firebaseAuth" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
@@ -44,6 +53,7 @@ androidx-material3 = { group = "androidx.compose.material3", name = "material3" 
 androidx-compose-navigation = { group = "androidx.navigation", name = "navigation-compose", version="2.8.4"}
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version = "1.7.3" }
 ktor-client-android_z = { module = "io.ktor:ktor-client-android", version.ref = "ktorClientEngine_zVersion" }
+play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuthVersion" }
 postgrest-kt = { module = "io.github.jan-tennert.supabase:postgrest-kt", version.ref = "postgrestKt" }
 sqlite = { group = "androidx.sqlite", name = "sqlite", version.ref = "sqliteVersion" }
 androidx-sqlite-bundled = { group = "androidx.sqlite", name = "sqlite-bundled", version.ref = "sqliteBundled" }
@@ -52,6 +62,7 @@ ui = { module = "androidx.compose.ui:ui", version.ref = "ui" }
 ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "uiToolingPreview" }
 androidx-credentials = { group = "androidx.credentials", name = "credentials", version.ref = "credentialsVersion" }
 googleid = { group = "com.google.android.libraries.identity.googleid", name = "googleid", version.ref = "googleidVersion" }
+androidx-media3-common-ktx = { group = "androidx.media3", name = "media3-common-ktx", version.ref = "media3CommonKtxVersion" }
 
 
 [plugins]
