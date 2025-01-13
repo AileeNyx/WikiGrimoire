@@ -21,7 +21,7 @@ fun getImageFromName(imageName: String, isTemplate: Boolean, context: Context): 
 }
 
 fun generateImageFileName(name: String): String {
-    val userid = getUserId()
+    val userid = getUID()
     return "$name-$userid"
 }
 
