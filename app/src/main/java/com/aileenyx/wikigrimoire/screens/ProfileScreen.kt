@@ -16,12 +16,14 @@ import androidx.compose.material3.Text
 import androidx.compose.ui.platform.LocalContext
 import com.aileenyx.wikigrimoire.components.LocalNavController
 import com.aileenyx.wikigrimoire.components.Screen
+import com.aileenyx.wikigrimoire.util.getEmail
 import com.aileenyx.wikigrimoire.util.getUsername
-import com.aileenyx.wikigrimoire.util.signOut
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 
 @Composable
 fun ProfileScreen() {
-    val user = getUsername()
+    val user = getEmail()
     val navController = LocalNavController.current
     val localContext = LocalContext.current
 
@@ -45,7 +47,7 @@ fun ProfileScreen() {
             Spacer(modifier = Modifier.height(8.dp))
             Button(
                 onClick = {
-                    signOut(localContext)
+                    Firebase.auth.signOut()
                     navController.navigate(Screen.LoginScreen)
                 },
                 modifier = Modifier.fillMaxWidth()

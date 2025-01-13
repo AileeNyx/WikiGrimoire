@@ -72,10 +72,6 @@ dependencies {
     implementation(libs.firebase.storage)
     implementation(libs.play.services.auth)
 
-    implementation(libs.ktor.client.android.z)
-    implementation(libs.postgrest.kt)
-    implementation(libs.auth.kt)
-
     implementation(libs.sqlite)
     implementation(libs.androidx.sqlite.bundled)
     implementation(libs.dotenv.kotlin)

@@ -16,7 +16,6 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.media3.common.util.Log
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -30,11 +29,9 @@ import com.aileenyx.wikigrimoire.ui.theme.WikiGrimoireTheme
 import com.aileenyx.wikigrimoire.components.Screen
 import com.aileenyx.wikigrimoire.components.tabs
 import com.aileenyx.wikigrimoire.screens.ProfileScreen
-import com.aileenyx.wikigrimoire.util.getSessionToken
-import com.aileenyx.wikigrimoire.util.isActiveSession
+import com.aileenyx.wikigrimoire.util.activeSession
 import com.aileenyx.wikigrimoire.util.migrateTemplates
 import com.aileenyx.wikigrimoire.util.populateTemplates
-import com.aileenyx.wikigrimoire.util.storeSessionToken
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -66,15 +63,9 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 NavControllerProvider.navController = navController
 
-                var isActiveSession by remember { mutableStateOf(getSessionToken(this@MainActivity) != null) }
-
-                fun updateSessionStatus() {
-                    isActiveSession = getSessionToken(this@MainActivity) != null
-                }
-
                 CompositionLocalProvider(LocalNavController provides navController) {
                     Scaffold(modifier = Modifier.fillMaxSize(), bottomBar = {
-                        if (isActiveSession) {
+                        if (activeSession()) {
                             NavigationBar {
                                 tabs.map { item ->
                                     NavigationBarItem(
@@ -96,7 +87,7 @@ class MainActivity : ComponentActivity() {
                         Box(modifier = Modifier.padding(innerPadding)) {
                             NavHost(
                                 navController = navController,
-                                startDestination = if (isActiveSession) {
+                                startDestination = if (activeSession()) {
                                     Screen.HomeScreen
                                 } else {
                                     Screen.LoginScreen
@@ -112,10 +103,7 @@ class MainActivity : ComponentActivity() {
                                     CreateScreen()
                                 }
                                 composable<Screen.LoginScreen> {
-                                    LoginScreen(onLoginSuccess = {
-                                        storeSessionToken(this@MainActivity, "your_session_token")
-                                        updateSessionStatus()
-                                    })
+                                    LoginScreen()
                                 }
                                 composable<Screen.ProfileScreen> {
                                     ProfileScreen()
@@ -131,8 +119,7 @@ class MainActivity : ComponentActivity() {
     public override fun onStart() {
         super.onStart()
         // Check if user is signed in (non-null) and update UI accordingly.
-        val currentUser = auth.currentUser
-        if (currentUser != null) {
+        if (activeSession()) {
             reload()
         }
     }
@@ -197,6 +184,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun reload() {
+
     }
 
     companion object {
