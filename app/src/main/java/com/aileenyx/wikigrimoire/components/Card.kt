@@ -30,7 +30,9 @@ fun WikiCard(
 ) {
     val context = LocalContext.current
 
-    val imageBitmap = remember(image) { getImageFromName(image, isTemplate, context) }
+    val isDefault = isTemplate || image == "template-default"
+
+    val imageBitmap = remember(image) { getImageFromName(image, isDefault, context) }
     val imagePainter = imageBitmap.let { androidx.compose.ui.graphics.painter.BitmapPainter(it!!) }
 
     val cardHeight = if (isLarge) 200.dp else 100.dp

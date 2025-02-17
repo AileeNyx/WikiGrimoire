@@ -10,8 +10,8 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.InputStream
 
-fun getImageFromName(imageName: String, isTemplate: Boolean, context: Context): ImageBitmap {
-    val inputStream: InputStream = if (isTemplate) {
+fun getImageFromName(imageName: String, isDefault: Boolean, context: Context): ImageBitmap {
+    val inputStream: InputStream = if (isDefault) {
         context.assets.open("images/$imageName.webp")
     } else {
         FileInputStream(File("${context.filesDir}/images/$imageName.webp"))
